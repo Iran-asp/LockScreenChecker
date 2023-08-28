@@ -1,16 +1,19 @@
 ﻿using LockScreenChecker.Properties;
 using Microsoft.Win32;
 using System;
+using System.Configuration;
 using System.Windows.Forms;
 
 namespace LockScreenChecker
 {
     public partial class frmMain : Form
     {
+        public string EthernetName { get; set; }
 
         public frmMain()
         {
             InitializeComponent();
+            EthernetName = ConfigurationManager.AppSettings["EthernetName"];
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -30,7 +33,7 @@ namespace LockScreenChecker
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = "/c netsh interface ip set dns \"Ethernet\" dhcp";
+                startInfo.Arguments = $"/c netsh interface ip set dns \"{EthernetName}\" dhcp";
                 process.StartInfo = startInfo;
                 process.Start();
                 MessageBox.Show("DNS config reset to DHCP.", "LockScreenChecker", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -52,6 +55,11 @@ namespace LockScreenChecker
                 this.ShowInTaskbar = false;
                 notifyIcon1.Visible = true;
             }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            EthernetName = ConfigurationManager.AppSettings["EthernetName"];
         }
     }
 }
