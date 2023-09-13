@@ -18,6 +18,7 @@ namespace LockScreenChecker
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            lblEthernetName.Text = $"We're checking [{EthernetName}] setting...";
             Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
             notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
             notifyIcon1.BalloonTipText = "برنامه بررسی لاک کردن ویندوز در حال اجرا است.";
@@ -54,6 +55,11 @@ namespace LockScreenChecker
             {
                 this.ShowInTaskbar = false;
                 notifyIcon1.Visible = true;
+            }
+            else
+            {
+                this.ShowInTaskbar = true;
+                notifyIcon1.Visible = false;
             }
         }
 
