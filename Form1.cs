@@ -1,7 +1,11 @@
 ﻿using LockScreenChecker.Properties;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LockScreenChecker
@@ -14,6 +18,46 @@ namespace LockScreenChecker
         {
             InitializeComponent();
             EthernetName = ConfigurationManager.AppSettings["EthernetName"];
+            GetEthernetList();
+        }
+
+        /// <summary>
+        /// Get ethernet list
+        /// </summary>
+        /// <returns></returns>
+        private void GetEthernetList()
+        {
+            lstEthernets.Items.Clear();
+            var result = new List<string>();
+
+            try
+            {
+                foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    var name = item.Name;
+                    string ips = string.Empty;
+
+                    for (int i = 0; i < item.GetIPProperties().DnsAddresses.Count; i++)
+                    {
+                        ips += item.GetIPProperties().DnsAddresses[i].ToString() + "|";
+                    }
+
+                    if (string.IsNullOrEmpty(ips))
+                    {
+                        result.Add($"{name}");
+                    }
+                    else
+                    {
+                        result.Add($"{name}->{ips}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Add($"Error: {ex.Message}");
+            }
+
+            lstEthernets.Items.AddRange(result.ToArray());
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -66,6 +110,7 @@ namespace LockScreenChecker
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             EthernetName = ConfigurationManager.AppSettings["EthernetName"];
+            GetEthernetList();
         }
     }
 }
